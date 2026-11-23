@@ -1,0 +1,44 @@
+{
+  "name": "web-version-notifier",
+  "version": "1.0.0",
+  "description": "Detect a new deployed version of your web app when the tab becomes visible and prompt users to refresh. Zero dependencies.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "version",
+    "version-check",
+    "new-version",
+    "notification",
+    "page-refresh",
+    "spa",
+    "web-app",
+    "visibilitychange",
+    "zero-dependency"
+  ],
+  "author": "yixiaocao33 <yidashi33@126.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cy-osp/web-version-notifier.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cy-osp/web-version-notifier/issues"
+  },
+  "homepage": "https://github.com/cy-osp/web-version-notifier#readme",
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0",
+    "vitest": "^2.1.0"
+  }
+}
