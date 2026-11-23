@@ -16,5 +16,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - run: npm ci
+      - name: Install dependencies (retry — npm "Exit handler never called" bug)
+        run: |
+          for i in 1 2 3; do
+            if npm ci; then break; fi
+            echo "npm ci failed (attempt $i), cleaning up and retrying..."
+            rm -rf node_modules
+            sleep 5
+          done
       - run: npm test
