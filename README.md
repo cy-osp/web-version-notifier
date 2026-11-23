@@ -1,60 +1,63 @@
-# VersionChecker
+# Web Version Notifier
 
-一个 JavaScript 工具类，用于监听 HTML 页面内容变化，并在检测到更新时触发回调函数。它使用 `visibilitychange` 事件，在页面可见时检查更新。
+Detect when your web app has a new version deployed and notify users to refresh the page — with zero dependencies.
 
-## 安装
+**Web Version Notifier** is a tiny (less than 2 KB), dependency-free JavaScript class for single-page applications (SPA) and multi-page sites. It polls a version endpoint (or any HTML/JSON resource), extracts the current version with a regex, and fires a callback whenever the deployed version changes. Detection runs only when the tab becomes **visible** again (via the `visibilitychange` event), so it never wastes requests while the user is away.
 
-无需安装，只需在项目中引入 `VersionChecker` 类。
+A typical use case: after you deploy a new build, users who keep the old tab open get a "🎉 A new version is available — refresh to update" prompt instead of silently running stale code.
 
-## 使用方法
+## Features
 
-### 引入类
+- ✅ **Zero dependencies** — pure ES6 class, copy & paste into any project (Vue / React / Angular / plain JS)
+- ✅ **Regex-based version extraction** — extract a version number, build hash, or any token from the response
+- ✅ **Visibility-aware polling** — checks on `visibilitychange`, no timers, no background requests
+- ✅ **Cache-busting** — requests use `cache: 'no-store'` + a timestamp query so you always get fresh content
+- ✅ **Automatic cleanup** — call `destroy()` to remove the listener
 
-将 `VersionChecker` 代码复制到你的 JavaScript 项目中。
+## Install
 
-### 示例
+No package manager needed — just copy `index.js` into your project:
+
+```javascript
+import VersionChecker from './index.js';
+```
+
+## Usage
 
 ```javascript
 const checker = new VersionChecker(
-  'https://example.com/version.html', // 需要检测的 URL
-  /version:\s*(\d+\.\d+\.\d+)/,   // 用于提取版本号的正则表达式
-  () => { console.log('检测到新版本！'); } // 版本更新时执行的回调函数
+  'https://example.com/version.html',   // URL to fetch
+  /version:\s*(\d+\.\d+\.\d+)/,         // regex to extract the version (optional)
+  () => {                               // called when the version changes
+    alert('A new version is available. Please refresh the page.');
+  }
 );
-```
 
-### 构造函数参数
-
-| 参数       | 类型            | 说明                                                         |
-| ---------- | --------------- | ------------------------------------------------------------ |
-| `htmlUrl`  | `string`        | 需要检测的 HTML 页面 URL。                                   |
-| `reg`      | `RegExp` (可选) | 用于提取 HTML 内容中特定部分的正则表达式,例如版本号或者某个静态文件hash值 |
-| `callback` | `function`      | 当检测到变更时执行的回调函数，比如可以弹窗提醒用户刷新页面   |
-
-## 方法
-
-### `destroy()`
-
-停止监听更新。
-
-```javascript
+// stop checking
 checker.destroy();
 ```
 
-## 工作原理
+### Constructor parameters
 
-1. 获取指定 `htmlUrl` 的内容。
-2. 使用提供的 `reg`（如果有）提取特定内容。
-3. 存储获取的内容，并监听页面可见性变化。
-4. 当页面重新可见时，再次获取内容。
-5. 如果新获取的内容与之前存储的内容不同，则执行回调函数。
+| Parameter  | Type              | Description                                                                 |
+| ---------- | ----------------- | --------------------------------------------------------------------------- |
+| `htmlUrl`  | `string`          | The URL to check for changes (HTML, text, JSON — anything `fetch` can read). |
+| `reg`      | `RegExp` (optional) | A regex with one capture group, used to extract the version/build hash from the response. If omitted, the entire response body is compared. |
+| `callback` | `function`        | Invoked when the extracted content differs from the last check.              |
 
-## 注意事项
+## How it works
 
-- `fetch` 使用 `cache: 'no-store'` 确保每次获取的内容都是最新的。
-- 通过 `document.visibilityState` 仅在页面可见时检查，优化性能。
-- 若获取数据时发生错误，会在控制台打印错误信息。
-- 确保 `htmlUrl` 可访问，并返回符合预期的数据。
+1. On construction, the URL is fetched once and the (optionally regex-extracted) content is stored as the baseline.
+2. A `visibilitychange` listener is attached.
+3. Whenever the page becomes visible again, the URL is re-fetched (with cache busting).
+4. If the new content differs from the baseline, your callback fires and the baseline is updated.
 
-## 许可协议
+## Notes
 
-MIT
+- Ensure the URL is CORS-accessible from your app's origin.
+- Errors during fetch are logged to the console and treated as "no change".
+- Detection happens only on tab visibility changes — add your own polling loop on top if you also want periodic checks while the tab is focused.
+
+## License
+
+[MIT](./LICENSE) © 2026 yixiaocao33
